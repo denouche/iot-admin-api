@@ -1,0 +1,20 @@
+{
+  "name": "iot-admin-api",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "debug": "^2.6.8",
+    "errorhandler": "^1.5.0",
+    "express": "^4.15.3",
+    "lodash": "^4.17.4",
+    "mongoose": "~4.6.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "DEBUG=*,-nodemon*,-express* nodemon src/app.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
