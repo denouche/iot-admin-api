@@ -8,4 +8,10 @@ const ApplicationSchema = new Schema({
     updated_at:         { type: Date }
 });
 
+ApplicationSchema.methods.toJSON = function() {
+  var obj = this.toObject();
+  delete obj.__v;
+  return obj;
+};
+
 module.exports = mongoose.model('Application', ApplicationSchema);

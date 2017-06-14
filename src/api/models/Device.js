@@ -13,7 +13,17 @@ const DeviceSchema = new Schema({
     ip:                 { type: String },
     _application:       { type: Schema.Types.ObjectId, ref: 'Application' },
     _version:           { type: Schema.Types.ObjectId, ref: 'Version' }
-
 });
+
+DeviceSchema.methods.toJSON = function() {
+  var obj = this.toObject();
+  delete obj.__v;
+  delete obj._thing.__v;
+  delete obj._application.__v;
+  delete obj._version.__v;
+  delete obj._version._application;
+  delete obj._version.firmware;
+  return obj;
+};
 
 module.exports = mongoose.model('Device', DeviceSchema);

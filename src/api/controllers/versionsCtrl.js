@@ -1,6 +1,7 @@
-var Version = require('../models/Version'),
+const Version = require('../models/Version'),
     Device = require('../models/Device'),
-	debug = require('debug')('iot-admin-api:versionsCtrl');
+	debug = require('debug')('iot-admin-api:versionsCtrl'),
+    fs = require('fs');
 
 module.exports._populate = function(doc) {
     return doc
@@ -12,7 +13,10 @@ module.exports.add = function(req, res) {
 	debug('add - begin');
 	debug(req.body)
 	let doc = new Version(req.body)
-    console.log('doc', doc)
+
+    let firmwareTempPath = '/home/denouche/tmp/cat.jpg'; // TODO here take the good file, and move this in /version/id/upload function
+    doc.firmware.data = fs.readFileSync(firmwareTempPath);
+
     doc.save(function(err) {
         if(err) { 
         	debug('add save error', err);
@@ -37,6 +41,20 @@ module.exports.get = function(req, res) {
         .then(function() {
             debug('get - end');
         });
+};
+
+module.exports.remove = function(req, res) {
+    debug('remove - begin');
+    Version.findByIdAndRemove(req.version._id, function (err) {
+        if(err) {
+            debug('remove error', err);
+            res.status(500).send(err);
+        }
+        else {
+            res.sendStatus(204);
+        }
+        debug('remove - end');
+    });
 };
 
 module.exports.modify = function(req, res) {
@@ -76,3 +94,17 @@ module.exports.getDevices = function(req, res) {
         });
 };
 
+module.exports.downloadFirmware = function(req, res) {
+    debug('downloadFirmware - begin');
+    module.exports._populate(req.version)
+        .then(function(doc) {
+            res.attachment(doc._application.name + '_' + doc.name + '.' + doc.plateform + '.bin');
+            res.send(doc.firmware.data);
+        }, function(err) {
+            debug('downloadFirmware populate error', err);
+            res.status(500).send(err);
+        })
+        .then(function() {
+            debug('downloadFirmware - end');
+        });
+};

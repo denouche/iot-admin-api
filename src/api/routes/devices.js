@@ -10,7 +10,9 @@ module.exports = function (router) {
     router.param('id', function(req, res, next, value) {
         Device.findOne({_id: req.params.id}, function (err, doc) {
             if(err) { return next(err); }
-            else if (!doc) { return next(new Error("Device not found")); }
+            else if (!doc) {
+                return res.status(404).json({message: "Entity not found"});
+            }
             req.device = doc;
             next();
         });
@@ -18,6 +20,7 @@ module.exports = function (router) {
 
     router.route('/:id')
         .get(devicesCtrl.get)
+        .delete(devicesCtrl.remove)
         .put(devicesCtrl.modify);
 
 };

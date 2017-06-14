@@ -4,10 +4,19 @@ const mongoose = require('mongoose'),
 
 const VersionSchema = new Schema({
     name:               { type: String },
+    plateform:          { type: String, enum: ['esp8266', 'raspberry'], required: true },
     _application:       { type: Schema.Types.ObjectId, ref: 'Application', required: true },
     created_at:         { type: Date, default: Date.now },
     firmware:           { data: Buffer }
 });
+
+VersionSchema.methods.toJSON = function() {
+  var obj = this.toObject();
+  delete obj.firmware;
+  delete obj.__v;
+  delete obj._application.__v;
+  return obj;
+};
 
 module.exports = mongoose.model('Version', VersionSchema);
 

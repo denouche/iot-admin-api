@@ -1,4 +1,4 @@
-var Device = require('../models/Device'),
+const Device = require('../models/Device'),
 	debug = require('debug')('iot-admin-api:devicesCtrl');
 
 module.exports.search = function(req, res) {
@@ -18,8 +18,8 @@ module.exports.search = function(req, res) {
         else {
             res.json(docs);
         }
+        debug('search - end');
     });
-    debug('search - end');
 };
 
 module.exports.add = function(req, res) {
@@ -55,6 +55,20 @@ module.exports.get = function(req, res) {
         .then(function() {
             debug('get - end');
         });
+};
+
+module.exports.remove = function(req, res) {
+    debug('remove - begin');
+    Device.findByIdAndRemove(req.device._id, function (err) {
+        if(err) {
+            debug('remove error', err);
+            res.status(500).send(err);
+        }
+        else {
+            res.sendStatus(204);
+        }
+        debug('remove - end');
+    });
 };
 
 module.exports.modify = function(req, res) {

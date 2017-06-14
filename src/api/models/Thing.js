@@ -8,4 +8,10 @@ const ThingSchema = new Schema({
     updated_at:         { type: Date }
 });
 
+ThingSchema.methods.toJSON = function() {
+  var obj = this.toObject();
+  delete obj.__v;
+  return obj;
+};
+
 module.exports = mongoose.model('Thing', ThingSchema);

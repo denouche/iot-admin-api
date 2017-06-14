@@ -1,4 +1,4 @@
-var Thing = require('../models/Thing'),
+const Thing = require('../models/Thing'),
     Device = require('../models/Device'),
 	debug = require('debug')('iot-admin-api:thingsCtrl');
 
@@ -9,8 +9,8 @@ module.exports.list = function(req, res) {
         else {
             res.json(docs);
         }
+        debug('list - end');
     });
-    debug('list - end');
 };
 
 module.exports.add = function(req, res) {
@@ -34,6 +34,20 @@ module.exports.get = function(req, res) {
     debug('get - begin');
     res.status(200).json(req.thing);
     debug('get - end');
+};
+
+module.exports.remove = function(req, res) {
+    debug('remove - begin');
+    Thing.findByIdAndRemove(req.thing._id, function (err) {
+        if(err) {
+            debug('remove error', err);
+            res.status(500).send(err);
+        }
+        else {
+            res.sendStatus(204);
+        }
+        debug('remove - end');
+    });
 };
 
 module.exports.modify = function(req, res) {

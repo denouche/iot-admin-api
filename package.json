@@ -15,6 +15,6 @@
   "scripts": {
     "dev": "DEBUG=*,-nodemon*,-express* nodemon src/app.js"
   },
-  "author": "",
+  "author": "Antoine Leveugle",
   "license": "ISC"
 }

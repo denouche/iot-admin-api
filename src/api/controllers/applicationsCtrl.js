@@ -1,4 +1,4 @@
-var Application = require('../models/Application'),
+const Application = require('../models/Application'),
     Device = require('../models/Device'),
     Version = require('../models/Version'),
 	debug = require('debug')('iot-admin-api:applicationsCtrl');
@@ -37,6 +37,20 @@ module.exports.get = function(req, res) {
     debug('get - begin');
     res.status(200).json(req.application);
     debug('get - end');
+};
+
+module.exports.remove = function(req, res) {
+    debug('remove - begin');
+    Application.findByIdAndRemove(req.application._id, function (err) {
+        if(err) {
+            debug('remove error', err);
+            res.status(500).send(err);
+        }
+        else {
+            res.sendStatus(204);
+        }
+        debug('remove - end');
+    });
 };
 
 module.exports.modify = function(req, res) {
