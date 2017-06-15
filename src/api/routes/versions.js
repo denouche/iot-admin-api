@@ -1,10 +1,13 @@
 const versionsCtrl = require('../controllers/versionsCtrl'),
-    Version = require('../models/Version');
+    Version = require('../models/Version'),
+    multer = require('multer');
+
+const upload = multer({ dest: '/tmp/iot-admin-api/firmwares/' })
 
 module.exports = function (router) {
 	
 	router.route('/')
-        .post(versionsCtrl.add);
+        .post(upload.single('firmware'), versionsCtrl.add);
 
     router.param('id', function(req, res, next, value) {
         Version.findOne({_id: req.params.id}, function (err, doc) {
@@ -20,7 +23,7 @@ module.exports = function (router) {
     router.route('/:id')
         .get(versionsCtrl.get)
         .delete(versionsCtrl.remove)
-        .put(versionsCtrl.modify);
+        .put(upload.single('firmware'), versionsCtrl.modify);
 
     router.route('/:id/devices')
         .get(versionsCtrl.getDevices);

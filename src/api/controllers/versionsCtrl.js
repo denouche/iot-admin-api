@@ -11,22 +11,43 @@ module.exports._populate = function(doc) {
 
 module.exports.add = function(req, res) {
 	debug('add - begin');
-	debug(req.body)
-	let doc = new Version(req.body)
+	debug(req.body);
 
-    let firmwareTempPath = '/home/denouche/tmp/cat.jpg'; // TODO here take the good file, and move this in /version/id/upload function
-    doc.firmware.data = fs.readFileSync(firmwareTempPath);
+    if(!req.body.name) {
+        return res.status(400).json({message: 'missing version name field'});
+    }
 
-    doc.save(function(err) {
-        if(err) { 
-        	debug('add save error', err);
-        	res.status(500).send(err);
-        }
-        else {
-            res.status(201).json(doc);
-        }
-    	debug('add - end');
-    });
+    Version.find({ _application: req.body._application, name: req.body.name }).exec()
+        .then(function(docs) {
+            if(docs.length > 0) {
+                res.status(400).json({message: 'another version with this name already exists for this application'});
+                return Promise.reject();
+            }
+        }, function (err) {
+            debug('add find error', err);
+            res.status(500).send(err);
+            return Promise.reject();
+        })
+        .then(function() {
+            let doc = new Version(req.body)
+
+            if(req.file) {
+                doc.firmware.data = fs.readFileSync(req.file.path);
+            }
+
+            return doc.save()
+                .then(function(doc) {
+                    res.status(201).json(doc);
+                }, function(err) {
+                    debug('add save error', err);
+                    res.status(500).send(err);
+                });
+        }, function() {
+            // do nothing but catch rejections
+        })
+        .then(function() {
+            debug('add - end');
+        });
 };
 
 module.exports.get = function(req, res) {
@@ -45,49 +66,54 @@ module.exports.get = function(req, res) {
 
 module.exports.remove = function(req, res) {
     debug('remove - begin');
-    Version.findByIdAndRemove(req.version._id, function (err) {
-        if(err) {
+    Version.findByIdAndRemove(req.version._id).exec()
+        .then(function(docs) {
+            res.sendStatus(204);
+        }, function (err) {
             debug('remove error', err);
             res.status(500).send(err);
-        }
-        else {
-            res.sendStatus(204);
-        }
-        debug('remove - end');
-    });
+        })
+        .then(function() {
+            debug('remove - end');
+        });
 };
 
 module.exports.modify = function(req, res) {
     debug('modify - begin');
     req.body.updated_at = Date.now();
-    Version.findByIdAndUpdate(req.version._id, req.body, {new: true}, function(err, newDoc) {
-        if(err) {
+
+    Version.findByIdAndUpdate(req.version._id, req.body, {new: true}).exec()
+        .then(function(newDoc) {
+            if(req.file) {
+                newDoc.firmware.data = fs.readFileSync(req.file.path);
+                return newDoc.save();
+            }
+            return newDoc;
+        })
+        .then(function(newDoc) {
+            res.json(newDoc);
+        }, function(err) {
             debug('modify error', err);
             res.status(500).send(err);
-        }
-        else {
-            res.json(newDoc);
-        }
-        debug('modify - end');
-    });
+        })
+        .then(function() {
+            debug('modify - end');
+        });
 };
 
 module.exports.getDevices = function(req, res) {
     debug('getDevices - begin');
     module.exports._populate(req.version)
         .then(function(version) {
-            Device.find({ _application: version._application._id, _version: version._id }, function (err, docs) {
-                if(err) {
+            return Device.find({ _application: version._application._id, _version: version._id }).exec()
+                .then(function(docs) {
+                    res.json(docs);
+                }, function(err) {
                     debug('getDevices error', err);
                     res.status(500).send(err);
-                }
-                else {
-                    res.json(docs);
-                }
-            });
+                });
         }, function(err) {
             debug('getDevices populate error', err);
-            res.status(500).send(err);
         })
         .then(function() {
             debug('getDevices - end');
@@ -99,6 +125,9 @@ module.exports.downloadFirmware = function(req, res) {
     module.exports._populate(req.version)
         .then(function(doc) {
             res.attachment(doc._application.name + '_' + doc.name + '.' + doc.plateform + '.bin');
+            if(!doc.firmware || !doc.firmware.data || doc.firmware.data.length === 0) {
+                return res.sendStatus(404);
+            }
             res.send(doc.firmware.data);
         }, function(err) {
             debug('downloadFirmware populate error', err);
