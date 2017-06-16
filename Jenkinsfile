@@ -4,8 +4,12 @@ node {
 
 	projectName = "iot-admin-api"
 
-	def sanitizedBuildTag = sh script: "echo -n '${env.BUILD_TAG}' | sed -r 's/[^a-zA-Z0-9_.-]//g' | tr '[:upper:]' '[:lower:]'", returnStdout: true
+	def sanitizedBuildTag = sh script: "echo -n '${env	.BUILD_TAG}' | sed -r 's/[^a-zA-Z0-9_.-]//g' | tr '[:upper:]' '[:lower:]'", returnStdout: true
 	imageName = "${projectName}-${sanitizedBuildTag}"
+	
+  	version = null
+	dockerImageVersion = null
+	jeanMichelAbortBuild = false
 
 	try {
 		stage('Checkout') {
@@ -27,35 +31,35 @@ node {
 	    stage('Build project') {
 			docker.build("${imageName}", '.')
 		}
-/*
+
 
 
 	    if (isRelease()) {
 	        stage('Release') {
 	        	releaseImageName = "${projectName}-release"
 				docker.build(releaseImageName, "-f Dockerfile.release .")
-					sshagent (credentials: ['github_jenkins']) {
-					sh "docker run --rm -v /var/jenkins_home/.ssh/id_rsa:/root/.ssh/id_rsa -v \$(pwd):/usr/src/app/ ${releaseImageName} bash -c 'make release'"
+				sshagent (['6394728b-d88f-4534-b168-a513d8e6345b']) {
+					sh "docker run --rm -v /home/denouche/volumes/jenkins-agents/.ssh/id_rsa:/root/.ssh/id_rsa -v \$(pwd | sed 's|/home/jenkins/workspace/|/home/denouche/volumes/jenkins/workspace-tmp/|'):/usr/src/app/ ${releaseImageName} bash -c 'pwd && npm run release'"
 				}
 				sh "docker rmi ${releaseImageName}"
 
-				docker.build("${dockerServiceImage}", '.')
+				docker.build("${imageName}", '.')
 
 				// Now the release is done if needed, retrieve version number
 				version = getNPMVersion(readFile('package.json'))
 				dockerImageVersion = "denouche/${projectName}:${version}"
-				sh "docker tag ${dockerServiceImage} ${dockerImageVersion}"
-				docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+				sh "docker tag ${imageName} ${dockerImageVersion}"
+				docker.withRegistry('https://index.docker.io/v1/', 'ceba80c5-ac8d-407a-a43e-61dc1177b277') {
 					sh "docker push ${dockerImageVersion}"
 				}
 
 				// Push the commit and the git tag only if docker image was successfully pushed
-				sshagent (credentials: ['github_jenkins']) {
+				sshagent (['6394728b-d88f-4534-b168-a513d8e6345b']) {
 					sh "git remote -v"
 					sh "git push --follow-tags origin HEAD"
 				}
 	        }
-	    }*/
+	    }
     }
 	finally {
 		if(jeanMichelAbortBuild) {
