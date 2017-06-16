@@ -38,8 +38,8 @@ node {
 	        stage('Release') {
 	        	releaseImageName = "${projectName}-release"
 				docker.build(releaseImageName, "-f Dockerfile.release .")
-					sshagent (credentials: ['github_jenkins']) {
-					sh "docker run --rm -v /var/jenkins_home/.ssh/id_rsa:/root/.ssh/id_rsa -v \$(pwd):/usr/src/app/ ${releaseImageName} bash -c 'make release'"
+					sshagent (credentials: ['jenkins']) {
+					sh "docker run --rm -v /home/jenkins/.ssh/id_rsa:/root/.ssh/id_rsa -v \$(pwd):/usr/src/app/ ${releaseImageName} bash -c 'make release'"
 				}
 				sh "docker rmi ${releaseImageName}"
 
@@ -54,7 +54,7 @@ node {
 				}
 
 				// Push the commit and the git tag only if docker image was successfully pushed
-				sshagent (credentials: ['github_jenkins']) {
+				sshagent (credentials: ['jenkins']) {
 					sh "git remote -v"
 					sh "git push --follow-tags origin HEAD"
 				}
