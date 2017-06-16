@@ -31,7 +31,7 @@ node {
 	    stage('Build project') {
 			docker.build("${imageName}", '.')
 		}
-/*
+
 
 
 	    if (isRelease()) {
@@ -59,7 +59,7 @@ node {
 					sh "git push --follow-tags origin HEAD"
 				}
 	        }
-	    }*/
+	    }
     }
 	finally {
 		if(jeanMichelAbortBuild) {
