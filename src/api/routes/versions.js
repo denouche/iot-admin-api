@@ -2,7 +2,7 @@ const versionsCtrl = require('../controllers/versionsCtrl'),
     Version = require('../models/Version'),
     multer = require('multer');
 
-const upload = multer({ dest: '/tmp/iot-admin-api/firmwares/' })
+const upload = multer({ dest: '/tmp/iot-admin-api/firmwares/' });
 
 module.exports = function (router) {
 	

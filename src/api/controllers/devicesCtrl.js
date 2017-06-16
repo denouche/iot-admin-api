@@ -26,7 +26,6 @@ module.exports.add = function(req, res) {
 	debug('add - begin');
 	debug(req.body)
 	let doc = new Device(req.body)
-    console.log('doc', doc)
     doc.save(function(err) {
         if(err) { 
         	debug('add save error', err);

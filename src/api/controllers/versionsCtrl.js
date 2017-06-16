@@ -1,7 +1,8 @@
 const Version = require('../models/Version'),
     Device = require('../models/Device'),
 	debug = require('debug')('iot-admin-api:versionsCtrl'),
-    fs = require('fs');
+    fs = require('fs'),
+    semver = require('semver');
 
 module.exports._populate = function(doc) {
     return doc
@@ -17,33 +18,47 @@ module.exports.add = function(req, res) {
         return res.status(400).json({message: 'missing version name field'});
     }
 
-    Version.find({ _application: req.body._application, name: req.body.name }).exec()
+    Version.find({ _application: req.body._application, plateform: req.body.plateform})
+        .sort({ created_at : -1 })
+        .limit(1)
+        .exec()
+        .then(function(lastVersion) {
+            if(!lastVersion || lastVersion.length === 0) {
+                res.status(404).json({message: `no last version found for application ${req.body._application} and plateform ${req.body.plateform}`});
+                return Promise.reject();
+            }
+            if(!semver.gt(req.body.name, lastVersion[0].name)) {
+                res.status(400).json({message: `You cannot create a version lower than existing ones for this plateform, the latest version is ${lastVersion[0].name}`});
+                return Promise.reject();
+            }
+            return Version.find({ _application: req.body._application, name: req.body.name, plateform: req.body.plateform }).exec();
+        }, function(err) {
+            debug('add find last version error', err);
+            return Promise.reject();
+        })
         .then(function(docs) {
             if(docs.length > 0) {
-                res.status(400).json({message: 'another version with this name already exists for this application'});
+                res.status(400).json({message: 'another version with this name already exists for this application and this plateform'});
                 return Promise.reject();
             }
         }, function (err) {
             debug('add find error', err);
-            res.status(500).send(err);
             return Promise.reject();
         })
         .then(function() {
             let doc = new Version(req.body)
-
             if(req.file) {
                 doc.firmware.data = fs.readFileSync(req.file.path);
             }
-
-            return doc.save()
-                .then(function(doc) {
-                    res.status(201).json(doc);
-                }, function(err) {
-                    debug('add save error', err);
-                    res.status(500).send(err);
-                });
+            return doc.save();
         }, function() {
-            // do nothing but catch rejections
+            return Promise.reject();
+        })
+        .then(function(doc) {
+            res.status(201).json(doc);
+        }, function(err) {
+            debug('add save error', err);
+            res.status(500).send(err);
         })
         .then(function() {
             debug('add - end');

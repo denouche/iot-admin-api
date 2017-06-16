@@ -14,10 +14,11 @@ apiApp.all('/*', function (req, res, next) {
 });
 
 const routes = {
-    '/devices':         __dirname + '/routes/devices',
-    '/applications':    __dirname + '/routes/applications',
-    '/things':          __dirname + '/routes/things',
-    '/versions':        __dirname + '/routes/versions'
+    '/':                      __dirname + '/routes/public',
+    '/admin/devices':         __dirname + '/routes/devices',
+    '/admin/applications':    __dirname + '/routes/applications',
+    '/admin/things':          __dirname + '/routes/things',
+    '/admin/versions':        __dirname + '/routes/versions'
 }
 _.forEach(routes, (value, key) => {
     let router = express.Router();
