@@ -38,7 +38,7 @@ node {
 	        stage('Release') {
 	        	releaseImageName = "${projectName}-release"
 				docker.build(releaseImageName, "-f Dockerfile.release .")
-					sshagent (credentials: ['jenkins']) {
+					sshagent (['6394728b-d88f-4534-b168-a513d8e6345b']) {
 					sh "ls -al && pwd && hostname && ls -al \$(pwd) && docker run --rm -v /home/jenkins/.ssh/id_rsa:/root/.ssh/id_rsa -v \$(pwd)/:/usr/src/app/ ${releaseImageName} bash -c 'ls -al && pwd && hostname && ls -al && make release'"
 				}
 				sh "docker rmi ${releaseImageName}"
