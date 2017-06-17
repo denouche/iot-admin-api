@@ -1,6 +1,6 @@
 {
   "name": "iot-admin-api",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -17,7 +17,8 @@
   "devDependencies": {},
   "scripts": {
     "dev": "DEBUG=*,-nodemon*,-express* nodemon src/app.js",
-    "release": "standard-version && git push --tags origin master"
+    "release": "standard-version",
+    "start": "DEBUG=*,-nodemon*,-express* node src/app.js"
   },
   "author": "Antoine Leveugle",
   "license": "ISC"

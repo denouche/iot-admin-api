@@ -21,5 +21,5 @@ else if ('development' == env) {
 }
 
 
-webApp.listen(webApp.get('port'), '127.0.0.1');
+webApp.listen(webApp.get('port'), process.env.ADDRESS || '127.0.0.1');
 debug("Started in " + webApp.settings.env + " on port " + webApp.get('port'));
