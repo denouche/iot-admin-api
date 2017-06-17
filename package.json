@@ -17,7 +17,8 @@
   "devDependencies": {},
   "scripts": {
     "dev": "DEBUG=*,-nodemon*,-express* nodemon src/app.js",
-    "release": "standard-version"
+    "release": "standard-version",
+    "start": "DEBUG=*,-nodemon*,-express* node src/app.js"
   },
   "author": "Antoine Leveugle",
   "license": "ISC"
