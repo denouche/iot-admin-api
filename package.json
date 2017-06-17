@@ -17,7 +17,7 @@
   "devDependencies": {},
   "scripts": {
     "dev": "DEBUG=*,-nodemon*,-express* nodemon src/app.js",
-    "release": "standard-version && git push --tags origin master"
+    "release": "standard-version && git push --tags origin HEAD"
   },
   "author": "Antoine Leveugle",
   "license": "ISC"
