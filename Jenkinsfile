@@ -43,12 +43,12 @@ node {
 				}
 				sh "docker rmi ${releaseImageName}"
 
-				docker.build("${dockerServiceImage}", '.')
+				docker.build("${imageName}", '.')
 
 				// Now the release is done if needed, retrieve version number
 				version = getNPMVersion(readFile('package.json'))
 				dockerImageVersion = "denouche/${projectName}:${version}"
-				sh "docker tag ${dockerServiceImage} ${dockerImageVersion}"
+				sh "docker tag ${imageName} ${dockerImageVersion}"
 				docker.withRegistry('https://index.docker.io/v1/', 'ceba80c5-ac8d-407a-a43e-61dc1177b277') {
 					sh "docker push ${dockerImageVersion}"
 				}
