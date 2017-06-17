@@ -38,8 +38,8 @@ node {
 	        stage('Release') {
 	        	releaseImageName = "${projectName}-release"
 				docker.build(releaseImageName, "-f Dockerfile.release .")
-					sshagent (['6394728b-d88f-4534-b168-a513d8e6345b']) {
-					sh "ls -al && pwd && hostname && ls -al \$(pwd) && docker run --rm -v /home/jenkins/.ssh/id_rsa:/root/.ssh/id_rsa -v \$(pwd)/:/usr/src/app/ ${releaseImageName} bash -c 'ls -al && pwd && hostname && ls -al && make release'"
+				sshagent (['6394728b-d88f-4534-b168-a513d8e6345b']) {
+					sh "ls -al && pwd && hostname && ls -al \$(pwd) && ls -al /home/denouche/volumes/jenkins/workspace-tmp/ && docker run --rm -v /home/denouche/volumes/jenkins-agents/.ssh/id_rsa:/root/.ssh/id_rsa -v /home/denouche/volumes/jenkins/workspace-tmp/:/usr/src/app/ ${releaseImageName} bash -c 'ls -al && pwd && hostname && ls -al && make release'"
 				}
 				sh "docker rmi ${releaseImageName}"
 
@@ -49,12 +49,12 @@ node {
 				version = getNPMVersion(readFile('package.json'))
 				dockerImageVersion = "denouche/${projectName}:${version}"
 				sh "docker tag ${dockerServiceImage} ${dockerImageVersion}"
-				docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+				docker.withRegistry('https://index.docker.io/v1/', 'ceba80c5-ac8d-407a-a43e-61dc1177b277') {
 					sh "docker push ${dockerImageVersion}"
 				}
 
 				// Push the commit and the git tag only if docker image was successfully pushed
-				sshagent (credentials: ['jenkins']) {
+				sshagent (['6394728b-d88f-4534-b168-a513d8e6345b']) {
 					sh "git remote -v"
 					sh "git push --follow-tags origin HEAD"
 				}
