@@ -39,7 +39,7 @@ node {
 	        	releaseImageName = "${projectName}-release"
 				docker.build(releaseImageName, "-f Dockerfile.release .")
 				sshagent (['6394728b-d88f-4534-b168-a513d8e6345b']) {
-					sh "docker run --rm -v /home/denouche/volumes/jenkins-agents/.ssh/id_rsa:/root/.ssh/id_rsa -v \$(pwd | sed 's|/home/jenkins/workspace/|/home/denouche/volumes/jenkins/workspace-tmp/|'):/usr/src/app/ ${releaseImageName} bash -c 'pwd && npm run release'"
+					sh "docker run --rm -v /home/denouche/volumes/jenkins-agents/.ssh/id_rsa:/root/.ssh/id_rsa -v \$(pwd | sed 's|/home/jenkins/workspace/|/home/denouche/volumes/jenkins/workspace-tmp/|'):/usr/src/app/ ${releaseImageName} bash -c 'pwd && npm i && npm run release'"
 				}
 				sh "docker rmi ${releaseImageName}"
 
