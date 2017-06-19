@@ -24,10 +24,10 @@ module.exports.add = function(req, res) {
         .exec()
         .then(function(lastVersion) {
             if(!lastVersion || lastVersion.length === 0) {
-                res.status(404).json({message: `no last version found for application ${req.body._application} and plateform ${req.body.plateform}`});
-                return Promise.reject();
+                // This is the first version of this application
+                debug(`no last version found for application ${req.body._application} and plateform ${req.body.plateform}, apparently it is the first version of this application for this plateform`);
             }
-            if(!semver.gt(req.body.name, lastVersion[0].name)) {
+            else if(!semver.gt(req.body.name, lastVersion[0].name)) {
                 res.status(400).json({message: `You cannot create a version lower than existing ones for this plateform, the latest version is ${lastVersion[0].name}`});
                 return Promise.reject();
             }
