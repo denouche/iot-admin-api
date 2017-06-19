@@ -48,9 +48,12 @@ node {
 				// Now the release is done if needed, retrieve version number
 				version = getNPMVersion(readFile('package.json'))
 				dockerImageVersion = "denouche/${projectName}:${version}"
+				dockerImageLatest = "denouche/${projectName}:latest"
 				sh "docker tag ${imageName} ${dockerImageVersion}"
+				sh "docker tag ${imageName} ${dockerImageLatest}"
 				docker.withRegistry('https://index.docker.io/v1/', 'ceba80c5-ac8d-407a-a43e-61dc1177b277') {
 					sh "docker push ${dockerImageVersion}"
+					sh "docker push ${dockerImageLatest}"
 				}
 
 				// Push the commit and the git tag only if docker image was successfully pushed
