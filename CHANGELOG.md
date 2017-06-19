@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/denouche/iot-admin-api/compare/v0.2.2...v0.3.0) (2017-06-19)
+
+
+### Features
+
+* register is now an admin protected route. ([1192e93](https://github.com/denouche/iot-admin-api/commit/1192e93))
+
+
+
 <a name="0.2.2"></a>
 ## [0.2.2](https://github.com/denouche/iot-admin-api/compare/v0.2.1...v0.2.2) (2017-06-18)
 
