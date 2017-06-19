@@ -23,4 +23,7 @@ module.exports = function (router) {
         .delete(devicesCtrl.remove)
         .put(devicesCtrl.modify);
 
+    router.route('/register')
+        .post(devicesCtrl.register)
+
 };

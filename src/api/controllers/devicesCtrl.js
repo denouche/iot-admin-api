@@ -1,4 +1,6 @@
-const Device = require('../models/Device'),
+const Application = require('../models/Application'),
+    Device = require('../models/Device'),
+    Version = require('../models/Version'),
 	debug = require('debug')('iot-admin-api:devicesCtrl');
 
 module.exports.search = function(req, res) {
@@ -84,3 +86,51 @@ module.exports.modify = function(req, res) {
         debug('modify - end');
     });
 };
+
+module.exports.register = function(req, res) {
+    debug('register - begin');
+
+    let update = {
+        mac: req.body.mac,
+        ssid: req.body.ssid,
+        ip: req.body.ip,
+        last_register: Date.now(),
+        plateform: req.body.plateform
+    };
+
+    Application.findOne({ name: req.body.application }).exec()
+        .then(function(doc) {
+            if(!doc) {
+                debug(`register find application error, unknown application [${req.body.application}]`);
+                return Promise.reject();
+            }
+            update._application = doc._id;
+            return Version.findOne({ name: req.body.version, _application: doc._id }).exec();
+        }, function (err) {
+            debug('register find application error', err);
+            return Promise.reject();
+        })
+        .then(function(doc) {
+            if(!doc) {
+                debug(`register find version error, unknown version [${req.body.version}]`);
+                return;
+            }
+            update._version = doc._id;
+        }, function (err) {
+            debug('register find version error', err);
+            // Do not reject here, so the update will always occurs, also without application or version
+        })
+        .then(function() {
+            return Device.findOneAndUpdate({ mac: req.body.mac }, update, {setDefaultsOnInsert: true, new: true, upsert:true }).exec();
+        })
+        .then(function(updatedDevice) {
+            res.sendStatus(204);
+        }, function (err) {
+            debug('register update device error', err);
+            res.status(500).send(err);
+        })
+        .then(function() {
+            debug('register - end');
+        });
+};
+

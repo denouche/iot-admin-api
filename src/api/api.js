@@ -14,7 +14,7 @@ apiApp.all('/*', function (req, res, next) {
 });
 
 const routes = {
-    '/':                      __dirname + '/routes/public',
+    '/download':              __dirname + '/routes/download',
     '/admin/devices':         __dirname + '/routes/devices',
     '/admin/applications':    __dirname + '/routes/applications',
     '/admin/things':          __dirname + '/routes/things',
