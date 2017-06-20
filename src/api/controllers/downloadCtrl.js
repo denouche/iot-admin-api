@@ -52,10 +52,12 @@ module.exports.download = function(req, res) {
         })
         .then(function(lastVersion) {
             if(!lastVersion || lastVersion.length === 0) {
+                debug(`no last version found for device with mac address: ${mac}`);
                 res.status(404).json({message: `no last version found for device with mac address: ${mac}`});
                 return Promise.reject();
             }
             if(semver.lte(lastVersion[0].name, device._version.name)) {
+                debug(`the device with mac address: ${mac} is already at the most recent version of firmware`);
                 res.status(404).json({message: `the device with mac address: ${mac} is already at the most recent version of firmware`});
                 return Promise.reject();
             }
