@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/denouche/iot-admin-api/compare/v0.3.2...v0.4.0) (2017-06-20)
+
+
+### Bug Fixes
+
+* **download:** check application/version exists and the version is not the most recent ([f907aa8](https://github.com/denouche/iot-admin-api/commit/f907aa8))
+
+
+### Features
+
+* on register, if application or version does not exist, create it ([e0e69e0](https://github.com/denouche/iot-admin-api/commit/e0e69e0))
+
+
+
 <a name="0.3.2"></a>
 ## [0.3.2](https://github.com/denouche/iot-admin-api/compare/v0.3.1...v0.3.2) (2017-06-19)
 
