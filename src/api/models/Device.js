@@ -28,7 +28,7 @@ DeviceSchema.methods.toJSON = function() {
         delete obj._application.__v;
     }
     
-    if(obj._verion) {
+    if(obj._version) {
         delete obj._version.__v;
         delete obj._version._application;
         delete obj._version.firmware;
