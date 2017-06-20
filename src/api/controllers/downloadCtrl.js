@@ -1,6 +1,7 @@
 const Device = require('../models/Device'),
     Version = require('../models/Version'),
-	debug = require('debug')('iot-admin-api:publicCtrl');
+    debug = require('debug')('iot-admin-api:downloadCtrl'),
+    semver = require('semver');
 
 module.exports._populateDevice = function(doc) {
     return doc
@@ -18,10 +19,19 @@ module.exports.download = function(req, res) {
     debug('download - begin', req.query);
     let mac = req.query.mac;
     // Check plateform presence
+    let device;
     Device.findOne({ mac: mac }).exec()
         .then(function(device) {
             if(!device) {
                 res.status(404).json({message: `device with mac address ${mac} not found`});
+                return Promise.reject();
+            }
+            if(!device._application) {
+                res.status(409).json({message: `device with mac address ${mac} has no application associated with`});
+                return Promise.reject();
+            }
+            if(!device._version) {
+                res.status(409).json({message: `device with mac address ${mac} has no version associated with`});
                 return Promise.reject();
             }
             return module.exports._populateDevice(device);
@@ -31,6 +41,7 @@ module.exports.download = function(req, res) {
             return Promise.reject();
         })
         .then(function(devicePopulated) {
+            device = devicePopulated;
             return Version.find({ _application: devicePopulated._application._id, plateform: devicePopulated.plateform})
                 .sort({ created_at : -1 })
                 .limit(1)
@@ -42,6 +53,10 @@ module.exports.download = function(req, res) {
         .then(function(lastVersion) {
             if(!lastVersion || lastVersion.length === 0) {
                 res.status(404).json({message: `no last version found for device with mac address: ${mac}`});
+                return Promise.reject();
+            }
+            if(semver.lte(lastVersion[0].name, device._version.name)) {
+                res.status(404).json({message: `the device with mac address: ${mac} is already at the most recent version of firmware`});
                 return Promise.reject();
             }
             return module.exports._populateVersion(lastVersion[0]);
