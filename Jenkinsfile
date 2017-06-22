@@ -39,7 +39,7 @@ node {
 	        	releaseImageName = "${projectName}-release"
 				docker.build(releaseImageName, "-f Dockerfile.release .")
 				sshagent (['6394728b-d88f-4534-b168-a513d8e6345b']) {
-					sh "docker run --rm -v /home/denouche/volumes/jenkins-agents/.ssh/id_rsa:/root/.ssh/id_rsa -v \$(pwd | sed 's|/root/workspace/|/home/denouche/volumes/jenkins/workspace-tmp/|'):/usr/src/app/ ${releaseImageName} bash -c 'pwd && npm i && npm run release && rm -rf node_modules'"
+					sh "docker run --rm -v /home/denouche/volumes/jenkins-agents/.ssh/id_rsa:/root/.ssh/id_rsa -v \$(pwd | sed 's|/root/workspace/|/home/denouche/volumes/jenkins/workspace-tmp/|'):/usr/src/app/ ${releaseImageName} bash -c 'npm i && npm run release'"
 				}
 				sh "docker rmi ${releaseImageName}"
 
@@ -68,6 +68,10 @@ node {
 		if(jeanMichelAbortBuild) {
 			currentBuild.result = 'ABORTED'
 		}
+
+	    stage('Clean docker images') {
+	      sh "docker rmi ${imageName} ${dockerImageVersion} ${dockerImageLatest} || true"
+	    }
 	}
 
 }
