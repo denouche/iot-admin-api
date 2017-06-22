@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.4.3"></a>
+## [0.4.3](https://github.com/denouche/iot-admin-api/compare/v0.4.2...v0.4.3) (2017-06-22)
+
+
+### Bug Fixes
+
+* remove suffix for API, let users handle it in webserver configuration ([cb4316a](https://github.com/denouche/iot-admin-api/commit/cb4316a))
+
+
+
 <a name="0.4.2"></a>
 ## [0.4.2](https://github.com/denouche/iot-admin-api/compare/v0.4.1...v0.4.2) (2017-06-22)
 
