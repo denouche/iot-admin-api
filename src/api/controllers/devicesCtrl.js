@@ -99,30 +99,25 @@ module.exports.register = function(req, res) {
     };
 
     Application.findOne({ name: req.body.application }).exec()
-        .then(function(doc) {
-            if(!doc) {
-                debug(`register find application error, unknown application [${req.body.application}], will create it`);
-                let newApp = {
-                    name: req.body.application
-                };
-                let newDoc = new Application(newApp)
-                update._application = newDoc._id;
-                return newDoc.save();
+        .then(function(app) {
+            if(!app) {
+                debug(`register find application error, unknown application [${req.body.application}]`);
+                return Promise.reject(`register find application error, unknown application [${req.body.application}]`);
             }
-            update._application = doc._id;
-            return doc;
+            update._application = app._id;
+            return app;
         }, function (err) {
             debug('register find application error', err);
-            return Promise.reject();
+            return Promise.reject(err);
         })
-        .then(function(doc) {
-            return Version.findOne({ name: req.body.version, _application: doc._id }).exec();
+        .then(function(app) {
+            return Version.findOne({ name: req.body.version, _application: app._id }).exec();
         }, function (err) {
             debug('register unknown error', err);
-            return Promise.reject();
+            return Promise.reject(err);
         })
-        .then(function(doc) {
-            if(!doc) {
+        .then(function(vers) {
+            if(!vers) {
                 debug(`register find version error, unknown version [${req.body.version}], will create it`);
                 let newVersion = {
                     name: req.body.version,
@@ -133,7 +128,7 @@ module.exports.register = function(req, res) {
                 update._version = newDoc._id;
                 return newDoc.save();
             }
-            update._version = doc._id;
+            update._version = vers._id;
         }, function (err) {
             debug('register find version error', err);
             // Do not reject here, so the update will always occurs, also without application or version
