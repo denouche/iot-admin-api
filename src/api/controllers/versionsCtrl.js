@@ -12,8 +12,6 @@ module.exports._populate = function(doc) {
 
 module.exports.add = function(req, res) {
 	debug('add - begin');
-	debug(req.body);
-
     if(!req.body.name) {
         return res.status(400).json({message: 'missing version name field'});
     }

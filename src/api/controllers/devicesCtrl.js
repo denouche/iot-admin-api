@@ -15,29 +15,31 @@ module.exports.search = function(req, res) {
             query._version = req.query.version;
         }
     }
-    Device.find(query, function (err, docs) {
-        if(err) { res.status(500).send(err); }
-        else {
+    Device.find(query).exec()
+        .then(function(docs) {
             res.json(docs);
-        }
-        debug('search - end');
-    });
+        }, function(err) {
+            debug('search error', err);
+            res.status(500).send(err);
+        })
+        .then(function() {
+            debug('search - end');
+        });
 };
 
 module.exports.add = function(req, res) {
 	debug('add - begin');
-	debug(req.body)
-	let doc = new Device(req.body)
-    doc.save(function(err) {
-        if(err) { 
-        	debug('add save error', err);
-        	res.status(500).send(err);
-        }
-        else {
+	let doc = new Device(req.body);
+    doc.save()
+        .then(function() {
             res.status(201).json(doc);
-        }
-    	debug('add - end');
-    });
+        }, function(err) {
+            debug('add save error', err);
+            res.status(500).send(err);
+        })
+        .then(function() {
+            debug('add - end');
+        });
 };
 
 module.exports.get = function(req, res) {
@@ -60,31 +62,31 @@ module.exports.get = function(req, res) {
 
 module.exports.remove = function(req, res) {
     debug('remove - begin');
-    Device.findByIdAndRemove(req.device._id, function (err) {
-        if(err) {
+    Device.findByIdAndRemove(req.device._id).exec()
+        .then(function(docs) {
+            res.sendStatus(204);
+        }, function (err) {
             debug('remove error', err);
             res.status(500).send(err);
-        }
-        else {
-            res.sendStatus(204);
-        }
-        debug('remove - end');
-    });
+        })
+        .then(function() {
+            debug('remove - end');
+        });
 };
 
 module.exports.modify = function(req, res) {
     debug('modify - begin');
     req.body.updated_at = Date.now();
-    Device.findByIdAndUpdate(req.device._id, req.body, {new: true}, function(err, newDoc) {
-        if(err) {
+    Device.findByIdAndUpdate(req.device._id, req.body, {new: true}).exec()
+        .then(function(newDoc) {
+            res.json(newDoc);
+        }, function(err) {
             debug('modify error', err);
             res.status(500).send(err);
-        }
-        else {
-            res.json(newDoc);
-        }
-        debug('modify - end');
-    });
+        })
+        .then(function() {
+            debug('modify - end');
+        });
 };
 
 module.exports.register = function(req, res) {
