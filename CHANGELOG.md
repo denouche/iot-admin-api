@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/denouche/iot-admin-api/compare/v0.4.5...v0.5.0) (2017-06-28)
+
+
+### Features
+
+* allow to search device with empty application, version, or thing id, to be able to get the list of devices without applicatino, version, or thing ([0dd4000](https://github.com/denouche/iot-admin-api/commit/0dd4000))
+
+
+
 <a name="0.4.5"></a>
 ## [0.4.5](https://github.com/denouche/iot-admin-api/compare/v0.4.4...v0.4.5) (2017-06-27)
 
