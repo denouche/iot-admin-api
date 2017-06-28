@@ -1,18 +1,19 @@
 const Application = require('../models/Application'),
     Device = require('../models/Device'),
     Version = require('../models/Version'),
-	debug = require('debug')('iot-admin-api:devicesCtrl');
+    debug = require('debug')('iot-admin-api:devicesCtrl'),
+    _ = require('lodash');
 
 module.exports.search = function(req, res) {
-	debug('search - begin');
+    debug('search - begin');
     let query = {};
-    if(req.query.thing) {
-        query._thing = req.query.thing;
+    if(!_.isNil(req.query.thing)) {
+        query._thing = req.query.thing || null;
     }
-    else if (req.query.application) {
-        query._application = req.query.application;
-        if(req.query.version) {
-            query._version = req.query.version;
+    else if (!_.isNil(req.query.application)) {
+        query._application = req.query.application || null ;
+        if(!_.isNil(req.query.version)) {
+            query._version = req.query.version || null;
         }
     }
     Device.find(query).exec()
@@ -28,8 +29,8 @@ module.exports.search = function(req, res) {
 };
 
 module.exports.add = function(req, res) {
-	debug('add - begin');
-	let doc = new Device(req.body);
+    debug('add - begin');
+    let doc = new Device(req.body);
     doc.save()
         .then(function() {
             res.status(201).json(doc);
