@@ -7,6 +7,7 @@ const DeviceSchema = new Schema({
     mac:                { type: String, required: true },
     ssid:               { type: String },
     ip:                 { type: String },
+    comment:            { type: String },
     last_register:      { type: Date },
     plateform:          { type: String, enum: ['esp8266', 'raspberry'] },
     created_at:         { type: Date, default: Date.now },

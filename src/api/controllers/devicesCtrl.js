@@ -98,13 +98,17 @@ module.exports.register = function(req, res) {
         ssid: req.body.ssid,
         ip: req.body.ip,
         last_register: Date.now(),
-        plateform: req.body.plateform
+        plateform: req.body.plateform,
+        comment: null,
+        _application: null,
+        _version: null
     };
 
     Application.findOne({ name: req.body.application }).exec()
         .then(function(app) {
             if(!app) {
                 debug(`register find application error, unknown application [${req.body.application}]`);
+                update.comment = `This devices tried to register to the unknown application [${req.body.application}]`
                 return Promise.reject(`register find application error, unknown application [${req.body.application}]`);
             }
             update._application = app._id;
