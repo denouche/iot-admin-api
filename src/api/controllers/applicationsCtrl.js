@@ -40,7 +40,13 @@ module.exports.get = function(req, res) {
 
 module.exports.remove = function(req, res) {
     debug('remove - begin');
-    Version.remove({ _application: req.application._id }).exec()
+    Device.update({ _application: req.application._id }, { _application: null, _version: null }, { multi: true }).exec()
+        .then(function() {
+            return Version.remove({ _application: req.application._id }).exec();
+        }, function(err) {
+            debug('device updateMany error', err);
+            return Promise.reject(err);
+        })
         .then(function() {
             return Application.findByIdAndRemove(req.application._id).exec();
         }, function(err) {
