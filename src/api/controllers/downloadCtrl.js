@@ -43,6 +43,7 @@ module.exports.download = function(req, res) {
         .then(function(devicePopulated) {
             device = devicePopulated;
             return Version.find({ _application: devicePopulated._application._id, plateform: devicePopulated.plateform})
+                .exists('firmware')
                 .sort({ created_at : -1 })
                 .limit(1)
                 .exec();
@@ -56,6 +57,7 @@ module.exports.download = function(req, res) {
                 res.status(404).json({message: `no last version found for device with mac address: ${mac}`});
                 return Promise.reject();
             }
+            debug(`Last version with firmware found for device with mac address ${mac} is ${lastVersion[0].name}`);
             if(semver.lte(lastVersion[0].name, device._version.name)) {
                 debug(`the device with mac address: ${mac} is already at the most recent version of firmware`);
                 res.status(404).json({message: `the device with mac address: ${mac} is already at the most recent version of firmware`});
@@ -67,10 +69,10 @@ module.exports.download = function(req, res) {
             return Promise.reject();
         })
         .then(function(lastVersionPopulated) {
-            res.attachment(lastVersionPopulated._application.name + '_' + lastVersionPopulated.name + '.' + lastVersionPopulated.plateform + '.bin');
             if(!lastVersionPopulated.firmware || !lastVersionPopulated.firmware.data || lastVersionPopulated.firmware.data.length === 0) {
-                return res.status(404).send({memssage: `No firmware found for version ${lastVersionPopulated.name}`});
+                return res.status(404).send({message: `No firmware found for version ${lastVersionPopulated.name}`});
             }
+            res.attachment(lastVersionPopulated._application.name + '_' + lastVersionPopulated.name + '.' + lastVersionPopulated.plateform + '.bin');
             res.send(lastVersionPopulated.firmware.data);
         }, function(err) {
             debug('download populate error', err);
