@@ -79,7 +79,13 @@ module.exports.get = function(req, res) {
 
 module.exports.remove = function(req, res) {
     debug('remove - begin');
-    Version.findByIdAndRemove(req.version._id).exec()
+    Device.update({ _version: req.version._id }, { _version: null }, { multi: true }).exec()
+        .then(function() {
+            return Version.findByIdAndRemove(req.version._id).exec();
+        }, function(err) {
+            debug('device updateMany error', err);
+            return Promise.reject(err);
+        })
         .then(function(docs) {
             res.sendStatus(204);
         }, function (err) {
