@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/denouche/iot-admin-api/compare/v0.5.0...v0.6.0) (2017-07-02)
+
+
+### Bug Fixes
+
+* filter versions without firmware on update ([726a749](https://github.com/denouche/iot-admin-api/commit/726a749))
+* on remove application, also reset the devices linked to this application ([8b42e1e](https://github.com/denouche/iot-admin-api/commit/8b42e1e))
+* on remove version, also reset the devices linked to this version ([2c55e03](https://github.com/denouche/iot-admin-api/commit/2c55e03))
+
+
+### Features
+
+* add device comment field, and on register to unknown application add a comment to give details about it ([934e100](https://github.com/denouche/iot-admin-api/commit/934e100))
+* add hasFirmware field to be informed if a version has a firmware of not without needed to download it ([0bd6f7d](https://github.com/denouche/iot-admin-api/commit/0bd6f7d))
+
+
+
 <a name="0.5.0"></a>
 # [0.5.0](https://github.com/denouche/iot-admin-api/compare/v0.4.5...v0.5.0) (2017-06-28)
 
