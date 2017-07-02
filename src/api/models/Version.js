@@ -12,6 +12,7 @@ const VersionSchema = new Schema({
 
 VersionSchema.methods.toJSON = function() {
   var obj = this.toObject();
+  obj.hasFirmware = !!(obj.firmware && obj.firmware.data);
   delete obj.firmware;
   delete obj.__v;
   delete obj._application.__v;
