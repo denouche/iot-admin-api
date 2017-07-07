@@ -16,32 +16,43 @@ module.exports.add = function(req, res) {
         return res.status(400).json({message: 'missing version name field'});
     }
 
-    Version.find({ _application: req.body._application, plateform: req.body.plateform})
-        .sort({ created_at : -1 })
-        .limit(1)
-        .exec()
+    let application;
+
+    Application.findOne({ name: req.body.application }).exec()
+        .then(function(app) {
+            if(!app) {
+                debug(`Unknown application [${req.body.application}]`);
+                return Promise.reject({status: 400, message: `Unknown application [${req.body.application}]`});
+            }
+            application = app;
+            return Version.find({ _application: application._id, plateform: req.body.plateform})
+                .sort({ created_at : -1 })
+                .limit(1)
+                .exec();
+        }, function (err) {
+            debug('add version application error, search existing application', err);
+            return Promise.reject({status: 500, message: err});
+        })
         .then(function(lastVersion) {
             if(!lastVersion || lastVersion.length === 0) {
                 // This is the first version of this application
-                debug(`no last version found for application ${req.body._application} and plateform ${req.body.plateform}, apparently it is the first version of this application for this plateform`);
+                debug(`no last version found for application ${application._id} and plateform ${req.body.plateform}, apparently it is the first version of this application for this plateform`);
             }
             else if(!semver.gt(req.body.name, lastVersion[0].name)) {
-                res.status(400).json({message: `You cannot create a version lower than existing ones for this plateform, the latest version is ${lastVersion[0].name}`});
-                return Promise.reject();
+                return Promise.reject({status: 400, message: `You cannot create a version lower than existing ones for this plateform, the latest version is ${lastVersion[0].name}`});
             }
-            return Version.find({ _application: req.body._application, name: req.body.name, plateform: req.body.plateform }).exec();
+            return Version.find({ _application: application._id, name: req.body.name, plateform: req.body.plateform }).exec();
         }, function(err) {
             debug('add find last version error', err);
-            return Promise.reject();
+            return Promise.reject({status: 500, message: err});
         })
         .then(function(docs) {
             if(docs.length > 0) {
-                res.status(400).json({message: 'another version with this name already exists for this application and this plateform'});
-                return Promise.reject();
+                return Promise.reject({status: 400, message: 'Another version with this name already exists for this application and this plateform'});
             }
         }, function (err) {
             debug('add find error', err);
-            return Promise.reject();
+            return Promise.reject({status: 500, message: err});
         })
         .then(function() {
             let doc = new Version(req.body)
@@ -49,14 +60,14 @@ module.exports.add = function(req, res) {
                 doc.firmware.data = fs.readFileSync(req.file.path);
             }
             return doc.save();
-        }, function() {
-            return Promise.reject();
+        }, function(err) {
+            return Promise.reject({status: 500, message: err});
         })
         .then(function(doc) {
             res.status(201).json(doc);
         }, function(err) {
             debug('add save error', err);
-            res.status(500).send(err);
+            res.status(err.status).send({error: err.message});
         })
         .then(function() {
             debug('add - end');
