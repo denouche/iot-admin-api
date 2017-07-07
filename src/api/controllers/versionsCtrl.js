@@ -56,7 +56,8 @@ module.exports.add = function(req, res) {
             return Promise.reject({status: 500, message: err});
         })
         .then(function() {
-            let doc = new Version(req.body)
+            let doc = new Version(req.body);
+            doc._application = application._id;
             if(req.file) {
                 doc.firmware.data = fs.readFileSync(req.file.path);
             }
