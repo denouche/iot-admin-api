@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.6.2"></a>
+## [0.6.2](https://github.com/denouche/iot-admin-api/compare/v0.6.1...v0.6.2) (2017-07-07)
+
+
+### Bug Fixes
+
+* fix missing import ([0385c26](https://github.com/denouche/iot-admin-api/commit/0385c26))
+
+
+
 <a name="0.6.1"></a>
 ## [0.6.1](https://github.com/denouche/iot-admin-api/compare/v0.6.0...v0.6.1) (2017-07-07)
 
