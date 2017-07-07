@@ -1,10 +1,10 @@
 const Application = require('../models/Application'),
     Device = require('../models/Device'),
     Version = require('../models/Version'),
-	debug = require('debug')('iot-admin-api:applicationsCtrl');
+    debug = require('debug')('iot-admin-api:applicationsCtrl');
 
 module.exports.list = function(req, res) {
-	debug('list - begin');
+    debug('list - begin');
     Application.find({}).exec()
         .then(function(docs) {
             res.json(docs);
@@ -18,14 +18,25 @@ module.exports.list = function(req, res) {
 };
 
 module.exports.add = function(req, res) {
-	debug('add - begin');
-	let doc = new Application(req.body);
-    doc.save()
+    debug('add - begin');
+    let doc;
+    Application.findOne({ name: req.body.name }).exec()
+        .then(function(app) {
+            if(app) {
+                debug(`Already existing application [${req.body.name}]`);
+                return Promise.reject({status: 409, message: `Another application with the same name already exists`});
+            }
+            doc = new Application(req.body);
+            return doc.save();
+        }, function (err) {
+            debug('add application application error, search existing application', err);
+            return Promise.reject({status: 500, message: err});
+        })
         .then(function() {
             res.status(201).json(doc);
         }, function(err) {
-        	debug('add save error', err);
-        	res.status(500).send(err);
+            debug('add save error', err);
+            res.status(err.status).send({error: err.message});
         })
         .then(function() {
             debug('add - end');
@@ -65,12 +76,22 @@ module.exports.remove = function(req, res) {
 module.exports.modify = function(req, res) {
     debug('modify - begin');
     req.body.updated_at = Date.now();
-    Application.findByIdAndUpdate(req.application._id, req.body, {new: true}).exec()
+    Application.findOne({ name: req.body.name }).exec()
+        .then(function(app) {
+            if(app && app._id.toString() !== req.application._id.toString()) {
+                debug(`Already existing application [${req.body.name}]`);
+                return Promise.reject({status: 409, message: `Another application with the same name already exists`});
+            }
+            return Application.findByIdAndUpdate(req.application._id, req.body, {new: true}).exec();
+        }, function (err) {
+            debug('add application application error, search existing application', err);
+            return Promise.reject({status: 500, message: err});
+        })
         .then(function(newDoc) {
             res.json(newDoc);
         }, function(err) {
             debug('modify error', err);
-            res.status(500).send(err);
+            res.status(err.status).send({error: err.message});
         })
         .then(function() {
             debug('modify - end');
