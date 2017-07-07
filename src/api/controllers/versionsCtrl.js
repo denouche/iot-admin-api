@@ -1,6 +1,7 @@
 const Version = require('../models/Version'),
     Device = require('../models/Device'),
-	debug = require('debug')('iot-admin-api:versionsCtrl'),
+    Application = require('../models/Application'),
+    debug = require('debug')('iot-admin-api:versionsCtrl'),
     fs = require('fs'),
     semver = require('semver');
 
@@ -11,7 +12,7 @@ module.exports._populate = function(doc) {
 };
 
 module.exports.add = function(req, res) {
-	debug('add - begin');
+    debug('add - begin');
     if(!req.body.name) {
         return res.status(400).json({message: 'missing version name field'});
     }
